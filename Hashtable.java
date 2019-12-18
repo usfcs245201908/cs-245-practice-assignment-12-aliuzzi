@@ -1,28 +1,29 @@
-import java.util.ArrayList;
 import java.lang.Math;
+import java.util.ArrayList;
+
 
 public class Hashtable {
 
-	private ArrayList<Node> bucketArray;
-	private int numBuckets;
-	private int size;
-	private float load_threshold = (float) 0.5;
+
+	int buckets;
+	int sizeOfTable = 0;
+	ArrayList<Node> bucket = new ArrayList<>();
+	float loadFactor = (float) 0.5;
 
 	public Hashtable() {
-		bucketArray = new ArrayList<>();
-		numBuckets = 2027;
-		size = 0;
+		buckets = 2027;
 
-		for (int i = 0; i < numBuckets; i++)
-			bucketArray.add(null);
+		for (int i = 0; i < buckets; i++){
+			bucket.add(null);
+		}
 	}
 
 	public int getSize() {
-		return size;
+		return sizeOfTable;
 	}
 
 	private boolean isEmpty() {
-		if (size == 0)
+		if (sizeOfTable == 0)
 			return true;
 		return false;
 	}
@@ -36,7 +37,7 @@ public class Hashtable {
 	}
 
 	public boolean containsKey(String key) {
-		Node head = bucketArray.get(getIndex(key));
+		Node head = bucket.get(getIndex(key));
 
 		while (head != null) {
 			if (head.key.equals(key))
@@ -48,7 +49,7 @@ public class Hashtable {
 	}
 
 	public String get(String key) {
-		Node head = bucketArray.get(getIndex(key));
+		Node head = bucket.get(getIndex(key));
 
 		while (head != null) {
 			if (head.key.equals(key))
@@ -62,7 +63,7 @@ public class Hashtable {
 
 	public void put(String key, String value) {
 		int index = getIndex(key);
-		Node head = bucketArray.get(index);
+		Node head = bucket.get(index);
 
 		while (head != null) {
 			if (head.key.equals(key)) {
@@ -72,30 +73,30 @@ public class Hashtable {
 			head = head.next;
 		}
 
-		head = bucketArray.get(index);
+		head = bucket.get(index);
 		Node newNode = new Node(key, value);
 
 		if (head == null) {
-			bucketArray.set(index, newNode);
+			bucket.set(index, newNode);
 		}
 
 		else {
 			newNode.next = head;
-			bucketArray.set(index, newNode);
+			bucket.set(index, newNode);
 		}
 
-		size++;
+		sizeOfTable++;
 
-		if ((1.0 * size) / numBuckets >= load_threshold) {
-			ArrayList<Node> temp = bucketArray;
-			bucketArray = new ArrayList<>();
-			numBuckets *= 2;
-			size = 0;
+		if ((1.0 * sizeOfTable) / numBuckets >= loadFactor) {
+			ArrayList<Node> temp = bucket;
+			bucket= new ArrayList<>();
+			buckets *= 2;
+			sizeOfTable = 0;
 
 			for (int i = 0; i < numBuckets; i++)
 				bucketArray.add(null);
 
-			for (int i = 0; i < temp.size(); i++) {
+			for (int i = 0; i < temp.sizeOfTable(); i++) {
 				Node oldNode = temp.get(i);
 				while (oldNode != null) {
 					put(oldNode.key, oldNode.value);
@@ -122,7 +123,7 @@ public class Hashtable {
 		if (head == null)
 			return null;
 
-		size--;
+		sizeOfTable--;
 
 		if (prev != null)
 			prev.next = head.next;
