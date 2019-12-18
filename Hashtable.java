@@ -5,17 +5,20 @@ import java.util.ArrayList;
 public class Hashtable {
 
 
-	int buckets;
-	int sizeOfTable = 0;
+	int buckets = 1000;
+	int sizeOfTable;
 	ArrayList<Node> bucket = new ArrayList<>();
 	float loadFactor = (float) 0.5;
 
 	public Hashtable() {
-		buckets = 2027;
 
 		for (int i = 0; i < buckets; i++){
 			bucket.add(null);
 		}
+	}
+
+	private int getHash(String key) {
+		return Math.abs(key.hashCode());
 	}
 
 	public int getSize() {
@@ -23,17 +26,15 @@ public class Hashtable {
 	}
 
 	private boolean isEmpty() {
-		if (sizeOfTable == 0)
-			return true;
-		return false;
+		if (sizeOfTable != 0)
+			return false;
+		return true;
 	}
 
-	private int getHash(String key) {
-		return Math.abs(key.hashCode());
-	}
+
 
 	private int getIndex(String key) {
-		return getHash(key) % numBuckets;
+		return getHash(key) % buckets;
 	}
 
 	public boolean containsKey(String key) {
@@ -87,20 +88,20 @@ public class Hashtable {
 
 		sizeOfTable++;
 
-		if ((1.0 * sizeOfTable) / numBuckets >= loadFactor) {
+		if ((float)sizeOfTable / buckets >= loadFactor) {
 			ArrayList<Node> temp = bucket;
 			bucket= new ArrayList<>();
 			buckets *= 2;
 			sizeOfTable = 0;
 
-			for (int i = 0; i < numBuckets; i++)
-				bucketArray.add(null);
+			for (int i = 0; i < buckets; i++)
+				bucket.add(null);
 
-			for (int i = 0; i < temp.sizeOfTable(); i++) {
-				Node oldNode = temp.get(i);
-				while (oldNode != null) {
-					put(oldNode.key, oldNode.value);
-					oldNode = oldNode.next;
+			for (int i = 0; i < temp.size(); i++) {
+				Node last = temp.get(i);
+				while (last != null) {
+					put(last.key, last.value);
+					last = last.next;
 				}
 			}
 		}
@@ -108,28 +109,31 @@ public class Hashtable {
 	}
 
 	public String remove(String key) {
+		Node previous = null;
 		int index = getIndex(key);
-		Node head = bucketArray.get(index);
+		Node head = bucket.get(index);
 
-		Node prev = null;
+		
 		while (head != null) {
-			if (head.key.equals(key))
+			if (head.key.equals(key)){
 				break;
+			}
 
-			prev = head;
+			previous = head;
 			head = head.next;
 		}
 
-		if (head == null)
+		if (head == null){
 			return null;
+		}
 
 		sizeOfTable--;
 
-		if (prev != null)
-			prev.next = head.next;
-		else
-			bucketArray.set(index, head.next);
+		if (previous != null){
+			previous.next = head.next;
+		}else{
+			bucket.set(index, head.next);
+		}
 		return head.value;
 	}
-
 }
